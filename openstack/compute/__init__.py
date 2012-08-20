@@ -90,6 +90,7 @@ class Config(object):
         'username': None,
         'apikey': None,
         'auth_url': "https://auth.api.rackspacecloud.com/v1.0",
+        'limits_url': "https://servers.api.rackspacecloud.com/v1.1/",
         'user_agent': 'python-openstack-compute/%s' % __version__,
         'allow_cache': False,
         'cloud_api' : 'RACKSPACE',
@@ -140,3 +141,4 @@ class Config(object):
         for key, value in self.DEFAULTS.iteritems():
             if isinstance(value, bool) and not isinstance(self.config[key], bool):
                 self.config[key] = strtobool(self.config[key])
+

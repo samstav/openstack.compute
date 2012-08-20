@@ -120,6 +120,12 @@ class Server(base.Resource):
 class ServerManager(base.ManagerWithFind):
     resource_class = Server
 
+    def get_region(self):
+        """
+        Get return build region of servers
+        """
+        return self._list("/limits", "limits")
+
     def get(self, server):
         """
         Get a server.
@@ -300,3 +306,4 @@ class ServerManager(base.ManagerWithFind):
         Perform a server "action" -- reboot/rebuild/resize/etc.
         """
         self.api.client.post('/servers/%s/action' % base.getid(server), body={action: info})
+

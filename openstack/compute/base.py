@@ -23,6 +23,8 @@ class Manager(object):
 
     def _list(self, url, response_key):
         resp, body = self.api.client.get(url)
+        if "limits" == response_key:
+            return body['limits']['buildRegion']        
         return [self.resource_class(self, res) for res in body[response_key]]
     
     def _get(self, url, response_key):
@@ -121,3 +123,4 @@ def getid(obj):
         return obj.id
     except AttributeError:
         return int(obj)
+

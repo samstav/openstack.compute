@@ -21,6 +21,7 @@ class ComputeClient(httplib2.Http):
         self.config = config
         self.management_url = None
         self.auth_token = None
+        self.tenant_id = None
         
         # httplib2 overrides
         self.force_exception_to_status_code = True
@@ -57,8 +58,13 @@ class ComputeClient(httplib2.Http):
         # re-authenticate and try again. If it still fails, bail.
         try:
             kwargs.setdefault('headers', {})['X-Auth-Token'] = self.auth_token
-            resp, body = self.request(self.management_url + url, method, **kwargs)
-            return resp, body
+            if "/limits" == url:
+                resp, body = self.request(self.config.limits_url + self.tenant_id + url,
+                                          method, **kwargs)
+                return resp, body
+            else:
+                resp, body = self.request(self.management_url + url, method, **kwargs)
+                return resp, body
         except exceptions.Unauthorized, ex:
             try:
                 self.authenticate()
@@ -68,6 +74,8 @@ class ComputeClient(httplib2.Http):
                 raise ex
 
     def get(self, url, **kwargs):
+        if url == "/limits":
+            return self._cs_request(url,'GET', **kwargs)
         url = self._munge_get_url(url)
         return self._cs_request(url, 'GET', **kwargs)
     
@@ -81,12 +89,26 @@ class ComputeClient(httplib2.Http):
         return self._cs_request(url, 'DELETE', **kwargs)
 
     def authenticate(self):
+        """
+        headers = {
+            "auth":{
+                "RAX-KSKEY:apiKeyCredentials":{
+                    "username": self.config.username,
+                    "apikey": self.config.apikey
+                }
+            }
+        }
+        """        
         headers = {
             'X-Auth-User': self.config.username,
             'X-Auth-Key': self.config.apikey,
         }
         resp, body = self.request(self.config.auth_url, 'GET', headers=headers)
         self.management_url = resp['x-server-management-url']
+        """
+        Temporary hack to pull tenant_id
+        """
+        self.tenant_id = self.management_url.split('/')[-1]
         self.auth_token = resp['x-auth-token']
         
     def _munge_get_url(self, url):
@@ -107,3 +129,5 @@ class ComputeClient(httplib2.Http):
             query.append(('fresh', str(time.time())))
             query = urllib.urlencode(query)
             return urlparse.urlunsplit((scheme, netloc, path, query, frag))
+
+
