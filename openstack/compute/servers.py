@@ -120,11 +120,11 @@ class Server(base.Resource):
 class ServerManager(base.ManagerWithFind):
     resource_class = Server
 
-    def get_region(self):
+    def get_region(self, tenant_id):
         """
         Get return build region of servers
         """
-        return self._list("/limits", "limits")
+        return self._list( tenant_id + "/limits/", "limits")
 
     def get(self, server):
         """
