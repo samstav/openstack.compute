@@ -11,7 +11,7 @@ if sys.version_info < (2,6):
 
 setup(
     name = "openstack.compute",
-    version = "2.0a1",
+    version = "2.0e",
     description = "Client library for the OpenStack Compute API",
     long_description = read('README.rst'),
     url = 'http://openstack.compute.rtfd.org/',
@@ -30,10 +30,10 @@ setup(
     ],
     namespace_packages = ["openstack"],
     install_requires = requirements,
-    
+
     tests_require = ["nose", "mock"],
     test_suite = "nose.collector",
-    
+
     entry_points = {
         'console_scripts': ['openstack-compute = openstack.compute.shell:main']
     }

@@ -32,7 +32,12 @@ class ComputeClient(httplib2.Http):
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['body'] = json.dumps(kwargs['body'])
             
-        resp, body = super(ComputeClient, self).request(*args, **kwargs)
+        # If we don't do this when using eventlet, we seem to come across this:
+        #  https://github.com/eventlet/eventlet/blob/...
+        #  80633ab22486228a64184bb9d8d6fd0ea7977677/eventlet/hubs/hub.py#L119
+        clean = httplib2.Http()
+        clean.force_exception_to_status_code = True
+        resp, body = clean.request(*args, **kwargs)
         if body:
             try:
                 body = json.loads(body)
