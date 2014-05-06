@@ -48,7 +48,7 @@ class ComputeClient(httplib2.Http):
         else:
             body = None
 
-        if resp.status in (400, 401, 403, 404, 413, 500):
+        if resp.status in (400, 401, 403, 404, 413, 500, 503):
             raise exceptions.from_response(resp, body)
 
         return resp, body
